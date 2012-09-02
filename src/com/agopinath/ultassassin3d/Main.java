@@ -1,4 +1,4 @@
-package mygame;
+package com.agopinath.ultassassin3d;
  
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.ZipLocator;

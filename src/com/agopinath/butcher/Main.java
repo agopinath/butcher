@@ -1,4 +1,4 @@
-package com.agopinath.ultassassin3d;
+package com.agopinath.butcher;
  
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.ZipLocator;
@@ -31,7 +31,6 @@ public class Main extends SimpleApplication {
  
   private BulletAppState bulletAppState;
   private CharacterControl player;
-  private Geometry playerModel;
   private Vector3f walkDirection = new Vector3f();
   private boolean left = false, right = false, up = false, down = false;
   private TerrainQuad terrain;
@@ -148,7 +147,7 @@ public class Main extends SimpleApplication {
         /** 2. Create the height map */
         AbstractHeightMap heightmap = null;
         Texture heightMapImage = assetManager.loadTexture(
-                "Textures/Terrain/splat/fortress512.png");
+                "Textures/heightmap_textures/map1.gif");
 
         heightmap = new ImageBasedHeightMap(heightMapImage.getImage());
         heightmap.load();
@@ -157,16 +156,18 @@ public class Main extends SimpleApplication {
         terrain = new TerrainQuad("mountainousTerrain", patchSize, 513, heightmap.getHeightMap());
  
         terrain.setMaterial(mat_terrain);
-        terrain.setLocalTranslation(0, -100, 0);
-        terrain.setLocalScale(2f, 1f, 2f);
-    
-        terrainPhysicsNode = new RigidBodyControl(CollisionShapeFactory.createMeshShape(terrain), 0);
-        terrain.addControl(terrainPhysicsNode);
+        terrain.setLocalTranslation(0, -100f, 0);
+        terrain.setLocalScale(8f, 4f, 8f);
         
-        TerrainLodControl control = new TerrainLodControl(terrain, getCamera());
-        terrain.addControl(control);
+        Node terrainScene = (Node) assetManager.loadModel("Textures/Map1.j3o");
+        terrainPhysicsNode = new RigidBodyControl(CollisionShapeFactory.createMeshShape(terrainScene), 0);
+        terrainScene.addControl(terrainPhysicsNode);
         
-        rootNode.attachChild(terrain);
+        TerrainLodControl lodControl = terrainScene.getControl(TerrainLodControl.class);
+            if (lodControl != null)
+                lodControl.setCamera(getCamera()); 
+        
+        rootNode.attachChild(terrainScene);
         bulletAppState.getPhysicsSpace().add(terrainPhysicsNode);
     }
     
@@ -177,18 +178,8 @@ public class Main extends SimpleApplication {
         player.setJumpSpeed(40);
         player.setFallSpeed(30);
         player.setGravity(35);
-        player.setPhysicsLocation(new Vector3f(0, 10, 0));
-        
-        Box b = new Box(Vector3f.ZERO, 1, 1, 1);
-        playerModel = new Geometry("cube", b);
-        Material mat = new Material(assetManager,
-          "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.Blue);
-        
-        playerModel.setMaterial(mat);
-        playerModel.addControl(player);
+        player.setPhysicsLocation(new Vector3f(0, 50f, 0));
 
-        rootNode.attachChild(playerModel);
         bulletAppState.getPhysicsSpace().add(player);   
     }
 }
